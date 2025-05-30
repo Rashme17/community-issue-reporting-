@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ..  # This is correct - builds from parent directory
+      dockerfile: docker/Dockerfile
+    container_name: community-issue-reporting-frontend  # Better name matching your project
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_API_URL=http://localhost:8081/api
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
+      - BROWSER=none
+      - HOST=0.0.0.0
+      - FAST_REFRESH=false  # Helps with Docker hot reload issues
+    volumes:
+      # Mount source code for hot reloading (development only)
+      - ../src:/app/src
+      - ../public:/app/public
+      - ../package.json:/app/package.json  # Also mount package.json for dependency changes
+      # Exclude node_modules to avoid conflicts
+      - /app/node_modules
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    networks:
+      - frontend-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+networks:
+  frontend-network:
+    driver: bridge
