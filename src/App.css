@@ -1,38 +1,312 @@
-.App {
-  text-align: center;
+/* App.css - Navbar styling to match home.css theme */
+
+/* Import the same CSS variables from home.css */
+:root {
+  --primary-beige: #f5f1e8;
+  --secondary-beige: #ede4d3;
+  --warm-beige: #e8dcc0;
+  --dark-beige: #d4c4a8;
+  --accent-orange: #d97745;
+  --light-orange: #e89668;
+  --deep-orange: #c5633a;
+  --text-dark: #3d3528;
+  --text-medium: #6b5d4f;
+  --text-light: #8b7d6f;
+  --success-green: #7da65d;
+  --warning-amber: #e6a532;
+  --error-red: #c85450;
+  --white: #ffffff;
+  --shadow-light: rgba(217, 119, 69, 0.1);
+  --shadow-medium: rgba(217, 119, 69, 0.15);
+  --shadow-strong: rgba(61, 53, 40, 0.2);
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Global body styling to match theme */
+body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, var(--primary-beige) 0%, var(--secondary-beige) 100%);
+  color: var(--text-dark);
+  min-height: 100vh;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
+/* Main app container */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Navbar Styles */
+nav {
+  background: linear-gradient(135deg, var(--white) 0%, var(--primary-beige) 100%);
+  padding: 16px 20px !important;
+  border-bottom: 2px solid var(--warm-beige) !important;
+  margin-bottom: 30px !important;
+  box-shadow: 0 4px 15px var(--shadow-light);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Navigation Links */
+nav a {
+  color: var(--text-dark);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 1rem;
+  padding: 10px 16px;
+  border-radius: 8px;
+  margin-right: 8px !important;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  border: 2px solid transparent;
+}
+
+nav a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(217, 119, 69, 0.1), transparent);
+  transition: left 0.5s;
+}
+
+nav a:hover::before {
+  left: 100%;
+}
+
+nav a:hover {
+  background: linear-gradient(135deg, var(--accent-orange) 0%, var(--deep-orange) 100%);
+  color: var(--white);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px var(--shadow-medium);
+  border-color: var(--deep-orange);
+}
+
+nav a:focus {
+  outline: 3px solid var(--light-orange);
+  outline-offset: 2px;
+}
+
+/* Active link styling (you can add this class programmatically) */
+nav a.active {
+  background: linear-gradient(135deg, var(--warm-beige) 0%, var(--dark-beige) 100%);
+  color: var(--text-dark);
+  border-color: var(--accent-orange);
+}
+
+/* Welcome message */
+nav span {
+  color: var(--text-medium) !important;
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-left: auto !important;
+  margin-right: 15px !important;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, var(--secondary-beige) 0%, var(--warm-beige) 100%);
+  border-radius: 20px;
+  border: 1px solid var(--dark-beige);
+  white-space: nowrap;
+}
+
+/* Logout Button */
+nav button {
+  background: linear-gradient(135deg, var(--error-red) 0%, #b04a46 100%) !important;
+  color: var(--white) !important;
+  border: 2px solid transparent !important;
+  border-radius: 8px !important;
+  padding: 10px 20px !important;
+  font-weight: 600 !important;
+  font-size: 0.95rem;
+  cursor: pointer !important;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  margin-left: 0 !important;
+}
+
+nav button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.5s;
+}
+
+nav button:hover::before {
+  left: 100%;
+}
+
+nav button:hover {
+  background: linear-gradient(135deg, #b04a46 0%, var(--error-red) 100%) !important;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(200, 84, 80, 0.3);
+  border-color: var(--error-red) !important;
+}
+
+nav button:focus {
+  outline: 3px solid rgba(200, 84, 80, 0.5);
+  outline-offset: 2px;
+}
+
+nav button:active {
+  transform: translateY(0);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  nav {
+    padding: 12px 15px !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  nav a {
+    margin-right: 5px !important;
+    padding: 8px 12px;
+    font-size: 0.9rem;
+  }
+  
+  nav span {
+    margin-left: 0 !important;
+    margin-right: 10px !important;
+    order: -1;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  
+  nav button {
+    padding: 8px 16px !important;
+    font-size: 0.9rem;
   }
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+@media (max-width: 480px) {
+  .container {
+    padding: 0 15px;
+  }
+  
+  nav {
+    padding: 10px 15px !important;
+    margin-bottom: 20px !important;
+  }
+  
+  nav a {
+    display: block;
+    width: 100%;
+    text-align: center;
+    margin-bottom: 5px;
+    margin-right: 0 !important;
+  }
+  
+  nav button {
+    width: 100%;
+    margin-top: 10px;
+  }
 }
 
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
+/* Animation for navbar appearance */
+@keyframes slideDown {
   from {
-    transform: rotate(0deg);
+    opacity: 0;
+    transform: translateY(-20px);
   }
   to {
-    transform: rotate(360deg);
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+nav {
+  animation: slideDown 0.5s ease-out;
+}
+
+/* Additional utility classes that match the theme */
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+}
+
+.page-title::after {
+  content: '';
+  position: absolute;
+  bottom: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent-orange), var(--light-orange));
+  border-radius: 2px;
+}
+
+.content-section {
+  background: var(--white);
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px var(--shadow-light);
+  border: 1px solid var(--warm-beige);
+  margin-bottom: 30px;
+}
+
+/* Loading spinner that matches theme */
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid var(--warm-beige);
+  border-top: 4px solid var(--accent-orange);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 20px auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Error message styling */
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(200, 84, 80, 0.1);
+  border: 1px solid rgba(200, 84, 80, 0.3);
+  border-radius: 12px;
+  color: var(--error-red);
+  font-weight: 500;
+  margin: 20px 0;
+}
+
+/* Success message styling */
+.success-message {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px;
+  background: rgba(125, 166, 93, 0.1);
+  border: 1px solid rgba(125, 166, 93, 0.3);
+  border-radius: 12px;
+  color: var(--success-green);
+  font-weight: 500;
+  margin: 20px 0;
 }

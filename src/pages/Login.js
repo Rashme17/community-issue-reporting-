@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../context/AuthContext";
 import { loginUser } from "../services/authService";
-
+import "../styles/login.css"; // Assuming you have a CSS file for styling
 const Login = () => {
   const { login } = useAuth();
   const [form, setForm] = useState({ username: "", password: "" });

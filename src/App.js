@@ -3,6 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import { AuthProvider, useAuth } from "./context/AuthContext";
+import "./App.css"; // Assuming you have a CSS file for global styles
 
 
 const Navbar = () => {
