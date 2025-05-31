@@ -3,7 +3,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import AppRoutes from "./routes/AppRoutes";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import "./styles/common.css";
+
 
 const Navbar = () => {
   const { user, logout } = useAuth();

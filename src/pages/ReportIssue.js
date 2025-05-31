@@ -1,20 +1,22 @@
-// src/pages/ReportIssue.js - Debug Version
 import { useState, useEffect } from "react";
 import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import IssueService from "../services/issueService";
 import LocationSelector from "../components/LocationSelector";
+import "../styles/ReportIssue.css";
 
 const ReportIssue = () => {
   const { user } = useAuth();
-  const [form, setForm] = useState({ 
-    title: "", 
-    description: "", 
+  const [form, setForm] = useState({
+    title: "",
+    description: "",
     location: "",
     latitude: null,
     longitude: null,
-    categoryId: "", 
-    image: null 
+    categoryId: "",
+    severity: "",
+    image: null,
+    severity: ""
   });
   const [categories, setCategories] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,20 +24,12 @@ const ReportIssue = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  // Debug: Log user and token info
   useEffect(() => {
-    console.log('Current user:', user);
-    console.log('Token from localStorage:', localStorage.getItem('token'));
-    console.log('User ID:', user?.id || user?.userId);
-    
-    // Check if user is authenticated
     if (!user) {
-      console.warn('No user found, redirecting to login');
-      navigate('/login');
+      navigate("/login");
     }
   }, [user, navigate]);
 
-  // Load categories on component mount
   useEffect(() => {
     setCategories([
       { id: 1, name: "Pothole" },
@@ -53,13 +47,13 @@ const ReportIssue = () => {
       return;
     }
 
-    if (!file.type.startsWith('image/')) {
+    if (!file.type.startsWith("image/")) {
       setError("Please select a valid image file");
       return;
     }
 
     setForm({ ...form, image: file });
-    
+
     const reader = new FileReader();
     reader.onloadend = () => {
       setImagePreview(reader.result);
@@ -77,88 +71,76 @@ const ReportIssue = () => {
     });
   };
 
-  // Updated handleSubmit function in ReportIssue.js
-const handleSubmit = async (e) => {
-  e.preventDefault();
-  setIsLoading(true);
-  setError("");
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setIsLoading(true);
+    setError("");
 
-  try {
-    const token = localStorage.getItem('token');
-    console.log('Token before request:', token ? 'Present' : 'Missing');
-    
-    if (!token) {
-      throw new Error('No authentication token found. Please login again.');
-    }
-
-    // Get user ID - handle both string and numeric IDs
-    const userId = user?.id || user?.userId || user?.sub || user?.username;
-    console.log('Using userId:', userId);
-    
-    if (!userId) {
-      throw new Error('Unable to determine user ID. Please login again.');
-    }
-
-    if (form.image) {
-      const formData = new FormData();
-      formData.append('title', form.title);
-      formData.append('description', form.description);
-      formData.append('location', form.location); // Don't include coordinates in location string
-      formData.append('userId', userId);
-      formData.append('categoryId', form.categoryId);
-      formData.append('image', form.image);
-      
-      // Add latitude and longitude as separate parameters if available
-      if (form.latitude !== null && form.longitude !== null) {
-        formData.append('latitude', form.latitude.toString());
-        formData.append('longitude', form.longitude.toString());
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error("No authentication token found. Please login again.");
       }
 
-      // Debug: Log FormData contents
-      console.log('FormData contents:');
-      for (let [key, value] of formData.entries()) {
-        console.log(key, value);
+      const userId = user?.id || user?.userId || user?.sub || user?.username;
+      if (!userId) {
+        throw new Error("Unable to determine user ID. Please login again.");
       }
 
-      await IssueService.createIssueWithImage(formData);
-    } else {
-      // For non-image requests, create location string with coordinates
-      const locationWithCoords = form.latitude && form.longitude 
-        ? `${form.location} (${form.latitude}, ${form.longitude})`
-        : form.location;
+      if (form.image) {
+        const formData = new FormData();
+        formData.append("title", form.title);
+        formData.append("description", form.description);
+        formData.append("location", form.location);
+        formData.append("userId", userId);
+        formData.append("categoryId", form.categoryId);
+        formData.append("image", form.image);
 
-      const issueData = {
-        title: form.title,
-        description: form.description,
-        location: locationWithCoords,
-        reportedBy: { id: userId },
-        category: { id: form.categoryId },
-        status: 'PENDING'
-      };
+        if (form.latitude !== null && form.longitude !== null) {
+          formData.append("latitude", form.latitude.toString());
+          formData.append("longitude", form.longitude.toString());
+        }
 
-      console.log('Issue data to send:', issueData);
-      await IssueService.createIssue(issueData);
+        // Severity can be added later when backend is ready
+        // formData.append("severity", form.severity);
+
+        await IssueService.createIssueWithImage(formData);
+      } else {
+        const locationWithCoords =
+          form.latitude && form.longitude
+            ? `${form.location} (${form.latitude}, ${form.longitude})`
+            : form.location;
+
+        const issueData = {
+          title: form.title,
+          description: form.description,
+          location: locationWithCoords,
+          reportedBy: { id: userId },
+          category: { id: form.categoryId },
+          status: "PENDING"
+          // severity: form.severity  // for future backend support
+        };
+
+        await IssueService.createIssue(issueData);
+      }
+
+      navigate("/user-dashboard");
+    } catch (error) {
+      console.error("Error creating issue:", error);
+      if (error.message.includes("403")) {
+        setError("Access denied. Please check your permissions or login again.");
+      } else if (error.message.includes("401")) {
+        setError("Authentication failed. Please login again.");
+        navigate("/login");
+      } else if (error.message.includes("400")) {
+        setError("Invalid data format. Please check all fields and try again.");
+      } else {
+        setError(error.message || "Failed to create issue. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
     }
-
-    navigate("/user-dashboard");
-    
-  } catch (error) {
-    console.error('Error creating issue:', error);
-    
-    if (error.message.includes('403')) {
-      setError("Access denied. Please check your permissions or login again.");
-    } else if (error.message.includes('401')) {
-      setError("Authentication failed. Please login again.");
-      navigate('/login');
-    } else if (error.message.includes('400')) {
-      setError("Invalid data format. Please check all fields and try again.");
-    } else {
-      setError(error.message || "Failed to create issue. Please try again.");
-    }
-  } finally {
-    setIsLoading(false);
-  }
-};
+  };
 
   const removeImage = () => {
     setForm({ ...form, image: null });
@@ -171,21 +153,6 @@ const handleSubmit = async (e) => {
         <div className="report-header">
           <h2>Report an Issue</h2>
           <p>Help us improve by reporting problems you've encountered</p>
-        </div>
-
-        {/* Debug info panel - remove in production */}
-        <div style={{ 
-          padding: '10px', 
-          backgroundColor: '#f0f0f0', 
-          border: '1px solid #ccc', 
-          borderRadius: '4px',
-          marginBottom: '20px',
-          fontSize: '12px'
-        }}>
-          <strong>Debug Info:</strong><br/>
-          User: {user ? 'Logged in' : 'Not logged in'}<br/>
-          Token: {localStorage.getItem('token') ? 'Present' : 'Missing'}<br/>
-          User ID: {user?.id || user?.userId || user?.sub || user?.username || 'Not found'}
         </div>
 
         {error && (
@@ -222,7 +189,7 @@ const handleSubmit = async (e) => {
               className="category-select"
             >
               <option value="">Select a category</option>
-              {categories.map(category => (
+              {categories.map((category) => (
                 <option key={category.id} value={category.id}>
                   {category.name}
                 </option>
@@ -230,7 +197,24 @@ const handleSubmit = async (e) => {
             </select>
           </div>
 
-          {/* Location Selector Component */}
+          <div className="form-group">
+  <label htmlFor="severity">Severity</label>
+  <select
+    id="severity"
+    value={form.severity}
+    onChange={(e) => setForm({ ...form, severity: e.target.value })}
+    required
+    disabled={isLoading}
+    className="severity-select"
+  >
+    <option value="">Select severity</option>
+    <option value="LOW">Low</option>
+    <option value="MEDIUM">Medium</option>
+    <option value="HIGH">High</option>
+  </select>
+</div>
+
+
           <LocationSelector
             location={form.location}
             latitude={form.latitude}
@@ -271,12 +255,12 @@ const handleSubmit = async (e) => {
                 Choose Image
               </label>
             </div>
-            
+
             {imagePreview && (
               <div className="image-preview">
                 <img src={imagePreview} alt="Preview" />
-                <button 
-                  type="button" 
+                <button
+                  type="button"
                   onClick={removeImage}
                   className="remove-image"
                   disabled={isLoading}
@@ -291,7 +275,7 @@ const handleSubmit = async (e) => {
 
           <button
             type="submit"
-            className={`report-button ${isLoading ? 'loading' : ''}`}
+            className={`report-button ${isLoading ? "loading" : ""}`}
             disabled={isLoading}
           >
             {isLoading ? (
